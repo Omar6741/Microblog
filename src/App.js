@@ -1,23 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { Route, Switch, Redirect } from "react-router-dom";
+import Homepage from "./Homepage";
+import AddPostForm from "./AddPostForm";
+import { BrowserRouter } from "react-router-dom";
+import PostDetail from "./PostDetail";
+import NavBar from "./Navbar";
+import "./App.css";
+import { addPostCreator } from './actions.js';
+import { useSelector, useDispatch } from "react-redux";
 
 function App() {
+  const dispatch = useDispatch();
+  const posts = useSelector(state => state.posts);
+  
+  function addPost(title, description, body, comments = []) {
+    const action = addPostCreator(title, description, body, comments = []);
+    dispatch(action);  
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <BrowserRouter>
+        <NavBar />
+        <Switch>
+          <Route exact path="/">
+            <Homepage posts={posts} />
+          </Route>
+          <Route exact path="/new">
+            <AddPostForm addPost={addPost} />
+          </Route>
+          <Route exact path="/:postId">
+            <PostDetail posts={posts} addPost={addPost} />
+          </Route>
+          <Redirect to="/" />
+        </Switch>
+      </BrowserRouter>
     </div>
   );
 }
